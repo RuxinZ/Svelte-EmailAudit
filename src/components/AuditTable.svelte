@@ -3,6 +3,7 @@
   import DateDisplay from 'components/DateDisplay.svelte'
   import TimeDisplay from 'components/TimeDisplay.svelte'
   import RecipientsDisplay from 'components/RecipientsDisplay.svelte'
+  import CollapsedRecipientCount from 'components/CollapsedRecipientCount.svelte'
   import type { Email } from 'types/Email'
 
   export let emails: Email[]
@@ -10,8 +11,10 @@
   const emailsByDate = groupBy<Email>(emails, ({ datetime }) =>
     new Date(datetime).toLocaleDateString()
   )
+
   // Convert into an array of arrays based on date sent
   const emailGroupsByDate = Object.entries(emailsByDate).map(val => val[1])
+  console.log('emailGroupsByDate: ', emailGroupsByDate)
 </script>
 
 <style lang="scss">
@@ -55,6 +58,9 @@
   .align-right {
     text-align: right;
   }
+  .flexbox {
+    display: flex;
+  }
 </style>
 
 <!--
@@ -81,8 +87,13 @@ Table component responsible for showing audited emails' information.
       {#each emailGroup as { from, to: recipients, subject, datetime }}
         <tr>
           <td>{from}</td>
-          <td>
+          <td class="flexbox">
+
             <RecipientsDisplay {recipients} />
+            {#if recipients.length > 1}
+              <CollapsedRecipientCount count={recipients.length - 1} />
+            {/if}
+
           </td>
           <td>{subject}</td>
           <td class="align-right">
